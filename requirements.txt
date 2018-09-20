@@ -1,3 +1,3 @@
 Pillow==5.2.0
 -e git+https://github.com/hzeller/rpi-rgb-led-matrix.git@79fa1623d60996c1cf2dfea10ae6932b9658fe0f#egg=rgbmatrix&subdirectory=bindings/python
-aioredis==1.1.0
+aiohttp

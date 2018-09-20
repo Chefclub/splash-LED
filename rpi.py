@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # git@github.com:Chefclub/splash-LED.git
 import asyncio
-import aioredis
+import aiohttp
 import random
 from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 
@@ -19,6 +19,7 @@ COLORS = [
 ]
 
 MAX_WIDTH = 192
+BOT_URL = "https://networks-monitoring.chefclub.tools/v1/splash-led-bot"
 
 
 def write_message(double_buffer, font, color, initX, y, message, reverse=False):
@@ -29,12 +30,14 @@ def write_message(double_buffer, font, color, initX, y, message, reverse=False):
 
 
 async def produce(queue):
-    redis = await aioredis.create_redis_pool(('localhost', 6379))
-
     while True:
-        info = await redis.blpop("SLACK_CHANNEL", encoding='utf-8', timeout=10)
-        if info:
-            await queue.put(info[1])
+        async with aiohttp.ClientSession() as session:
+            async with session.get(BOT_URL) as resp:
+                if resp.status == 200:
+                    body = await resp.json()
+                    await queue.put(body["message"])
+                else:
+                    print(await resp.json())
 
 
 async def consume(queue, matrix):
@@ -58,6 +61,7 @@ async def consume(queue, matrix):
 
     initX1 = -len(message1) * 10
     color1 = random.choice(colors)
+    color2 = None
     line1 = iter(
         write_message(double_buffer, font, color1, initX1, 13, message1, True)
     )
@@ -67,6 +71,7 @@ async def consume(queue, matrix):
         line2 = iter(
             write_message(double_buffer, font, color2, initX2, 29, message2, False)
         )
+
     while True:
         double_buffer.Clear()
         if message1:
