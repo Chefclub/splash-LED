@@ -55,11 +55,11 @@ async def consume(queue, matrix):
 
     initX1 = -len(message1) * 10
     line1 = iter(
-        write_message(double_buffer, font, random.choice(colors), initX1, 15, message1)
+        write_message(double_buffer, font, random.choice(colors), initX1, 12, message1)
     )
     initX2 = -len(message2) * 10
     line2 = iter(
-        write_message(double_buffer, font, random.choice(colors), initX2, 31, message2)
+        write_message(double_buffer, font, random.choice(colors), initX2, 29, message2)
     )
     while True:
         double_buffer.Clear()
