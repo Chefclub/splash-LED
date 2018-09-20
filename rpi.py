@@ -21,15 +21,11 @@ COLORS = [
 MAX_WIDTH = 192
 
 
-async def write_message(double_buffer, font, color, text):
-    initX = - len(text) * 5
-    y = 15  # Row 1
-
+def write_message(double_buffer, font, color, initX, y, message):
     for i in range(3):
-        for x in range(initX, MAX_WIDTH):
-            double_buffer.Clear()
-            graphics.DrawText(double_buffer, font, x, y, color, text)
-            await asyncio.sleep(0.01)
+        for x in range(MAX_WIDTH, initX, -1):
+            graphics.DrawText(double_buffer, font, x, y, color, message)
+            yield
 
 
 async def produce(queue):
@@ -39,12 +35,12 @@ async def produce(queue):
         info = await redis.blpop("SLACK_CHANNEL", encoding='utf-8', timeout=10)
         if info:
             await queue.put(info[1])
-        await asyncio.sleep(2)
 
 
 async def consume(queue, matrix):
     # Add double_buffer
     double_buffer = matrix.CreateFrameCanvas()
+    matrix.SwapOnVSync(double_buffer)
 
     # Init font
     font = graphics.Font()
@@ -53,12 +49,34 @@ async def consume(queue, matrix):
     # Init Colors
     colors = [graphics.Color(*c) for c in COLORS]
     print("Loaded")
+    # wait for an item from the producer
+    message1 = await queue.get()
+    message2 = await queue.get()
+
+    initX1 = -len(message1) * 10
+    line1 = iter(
+        write_message(double_buffer, font, random.choice(colors), initX1, 15, message1)
+    )
+    initX2 = -len(message2) * 10
+    line2 = iter(
+        write_message(double_buffer, font, random.choice(colors), initX2, 31, message2)
+    )
     while True:
-        # wait for an item from the producer
-        message = await queue.get()
         double_buffer.Clear()
-        await write_message(double_buffer, font, random.choice(colors), message)
+        try:
+            next(line1)
+        except StopIteration:
+            message1 = await queue.get()
+            initX1 = -len(message1) * 10
+            line1 = iter(write_message(double_buffer, font, random.choice(colors), initX1, 15, message1))
+        try:
+            next(line2)
+        except StopIteration:
+            message2 = await queue.get()
+            initX2 = -len(message2) * 10
+            line2 = iter(write_message(double_buffer, font, random.choice(colors), initX2, 31, message2))
         matrix.SwapOnVSync(double_buffer)
+        await asyncio.sleep(0.02)
 
 
 if __name__ == "__main__":
