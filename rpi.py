@@ -23,7 +23,7 @@ MAX_WIDTH = 192
 
 def write_message(double_buffer, font, color, initX, y, message, reverse=False):
     for i in range(3):
-        for x in range(MAX_WIDTH, initX, -1):
+        for x in range(MAX_WIDTH, initX, -1 if reverse else -2):
             graphics.DrawText(double_buffer, font, x, y, color, message)
             yield
 
@@ -57,13 +57,15 @@ async def consume(queue, matrix):
         message2 = None
 
     initX1 = -len(message1) * 10
+    color1 = random.choice(colors)
     line1 = iter(
-        write_message(double_buffer, font, random.choice(colors), initX1, 13, message1, True)
+        write_message(double_buffer, font, color1, initX1, 13, message1, True)
     )
     if message2:
         initX2 = -len(message2) * 10
+        color2 = random.choice([c for c in colors if c != color1])
         line2 = iter(
-            write_message(double_buffer, font, random.choice(colors), initX2, 29, message2, False)
+            write_message(double_buffer, font, color2, initX2, 29, message2, False)
         )
     while True:
         double_buffer.Clear()
@@ -77,7 +79,8 @@ async def consume(queue, matrix):
                     message1 = None
                 else:
                     initX1 = -len(message1) * 10
-                    line1 = iter(write_message(double_buffer, font, random.choice(colors), initX1, 15, message1))
+                    color1 = random.choice([c for c in colors if c != color2])
+                    line1 = iter(write_message(double_buffer, font, color1, initX1, 15, message1, True))
         else:
             try:
                 message1 = queue.get_nowait()
@@ -85,7 +88,8 @@ async def consume(queue, matrix):
                 message1 = None
             else:
                 initX1 = -len(message1) * 10
-                line1 = iter(write_message(double_buffer, font, random.choice(colors), initX1, 15, message1))
+                color1 = random.choice([c for c in colors if c != color2])
+                line1 = iter(write_message(double_buffer, font, color1, initX1, 15, message1, True))
         if message2:
             try:
                 next(line2)
@@ -96,7 +100,8 @@ async def consume(queue, matrix):
                     message2 = None
                 else:
                     initX2 = -len(message2) * 10
-                    line2 = iter(write_message(double_buffer, font, random.choice(colors), initX2, 31, message2))
+                    color2 = random.choice([c for c in colors if c != color1])
+                    line2 = iter(write_message(double_buffer, font, color2, initX2, 31, message2, False))
         else:
             try:
                 message2 = queue.get_nowait()
@@ -104,7 +109,8 @@ async def consume(queue, matrix):
                 message2 = None
             else:
                 initX2 = -len(message2) * 10
-                line2 = iter(write_message(double_buffer, font, random.choice(colors), initX2, 31, message2))
+                color2 = random.choice([c for c in colors if c != color1])
+                line2 = iter(write_message(double_buffer, font, color2, initX2, 31, message2, False))
 
         matrix.SwapOnVSync(double_buffer)
         await asyncio.sleep(0.02)
