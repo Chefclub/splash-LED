@@ -18,9 +18,18 @@ COLORS = [
     (61, 69, 163),  # Bleu Flag
 ]
 
+MAX_WIDTH = 192
 
-def write_message(double_buffer, font, color, text):
-    graphics.DrawText(double_buffer, font, 100, 15, color, text)
+
+async def write_message(double_buffer, font, color, text):
+    initX = - len(text) * 5
+    y = 15  # Row 1
+
+    for i in range(3):
+        for x in range(initX, MAX_WIDTH):
+            double_buffer.Clear()
+            graphics.DrawText(double_buffer, font, x, y, color, text)
+            await asyncio.sleep(0.01)
 
 
 async def produce(queue):
@@ -34,21 +43,21 @@ async def produce(queue):
 
 
 async def consume(queue, matrix):
+    # Add double_buffer
+    double_buffer = matrix.CreateFrameCanvas()
+
     # Init font
     font = graphics.Font()
     font.LoadFont("../../../fonts/10x20.bdf")
 
+    # Init Colors
+    colors = [graphics.Color(*c) for c in COLORS]
+    print("Loaded")
     while True:
         # wait for an item from the producer
         message = await queue.get()
-
-        # Add double_buffer
-        double_buffer = matrix.CreateFrameCanvas()
-        
-        # Init color
-        color = graphics.Color(*random.choice(COLORS))
-
-        write_message(double_buffer, font, color, message)
+        double_buffer.Clear()
+        await write_message(double_buffer, font, random.choice(colors), message)
         matrix.SwapOnVSync(double_buffer)
 
 
@@ -65,6 +74,7 @@ if __name__ == "__main__":
     # Matrix
     matrix = RGBMatrix(options=options)
 
+    print("Ready")
     loop = asyncio.get_event_loop()
     queue = asyncio.Queue(loop=loop)
     producer_coro = produce(queue)
