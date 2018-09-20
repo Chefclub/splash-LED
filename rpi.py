@@ -30,14 +30,19 @@ def write_message(double_buffer, font, color, initX, y, message, reverse=False):
 
 
 async def produce(queue):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(BOT_URL) as resp:
+            if resp.status == 200:
+                body = await resp.json()
+                await queue.put(body["message"])
+
     while True:
         async with aiohttp.ClientSession() as session:
             async with session.get(BOT_URL) as resp:
                 if resp.status == 200:
                     body = await resp.json()
                     await queue.put(body["message"])
-                else:
-                    print(await resp.json())
+        await asyncio.sleep(10)
 
 
 async def consume(queue, matrix):
@@ -140,5 +145,9 @@ if __name__ == "__main__":
     queue = asyncio.Queue(loop=loop)
     producer_coro = produce(queue)
     consumer_coro = consume(queue, matrix)
-    loop.run_until_complete(asyncio.gather(producer_coro, consumer_coro))
-    loop.close()
+    try:
+        loop.run_until_complete(asyncio.gather(producer_coro, consumer_coro))
+    except KeyboardInterrupt:
+        print("Bye")
+    else:
+        loop.close()
