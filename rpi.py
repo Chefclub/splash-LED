@@ -21,7 +21,7 @@ COLORS = [
 MAX_WIDTH = 192
 
 
-def write_message(double_buffer, font, color, initX, y, message):
+def write_message(double_buffer, font, color, initX, y, message, reverse=False):
     for i in range(3):
         for x in range(MAX_WIDTH, initX, -1):
             graphics.DrawText(double_buffer, font, x, y, color, message)
@@ -51,32 +51,64 @@ async def consume(queue, matrix):
     print("Loaded")
     # wait for an item from the producer
     message1 = await queue.get()
-    message2 = await queue.get()
+    try:
+        message2 = queue.get_nowait()
+    except asyncio.QueueEmpty:
+        message2 = None
 
     initX1 = -len(message1) * 10
     line1 = iter(
-        write_message(double_buffer, font, random.choice(colors), initX1, 12, message1)
+        write_message(double_buffer, font, random.choice(colors), initX1, 13, message1, True)
     )
-    initX2 = -len(message2) * 10
-    line2 = iter(
-        write_message(double_buffer, font, random.choice(colors), initX2, 29, message2)
-    )
+    if message2:
+        initX2 = -len(message2) * 10
+        line2 = iter(
+            write_message(double_buffer, font, random.choice(colors), initX2, 29, message2, False)
+        )
     while True:
         double_buffer.Clear()
-        try:
-            next(line1)
-        except StopIteration:
-            message1 = await queue.get()
-            initX1 = -len(message1) * 10
-            line1 = iter(write_message(double_buffer, font, random.choice(colors), initX1, 15, message1))
-        try:
-            next(line2)
-        except StopIteration:
-            message2 = await queue.get()
-            initX2 = -len(message2) * 10
-            line2 = iter(write_message(double_buffer, font, random.choice(colors), initX2, 31, message2))
+        if message1:
+            try:
+                next(line1)
+            except StopIteration:
+                try:
+                    message1 = queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    message1 = None
+                else:
+                    initX1 = -len(message1) * 10
+                    line1 = iter(write_message(double_buffer, font, random.choice(colors), initX1, 15, message1))
+        else:
+            try:
+                message1 = queue.get_nowait()
+            except asyncio.QueueEmpty:
+                message1 = None
+            else:
+                initX1 = -len(message1) * 10
+                line1 = iter(write_message(double_buffer, font, random.choice(colors), initX1, 15, message1))
+        if message2:
+            try:
+                next(line2)
+            except StopIteration:
+                try:
+                    message2 = queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    message2 = None
+                else:
+                    initX2 = -len(message2) * 10
+                    line2 = iter(write_message(double_buffer, font, random.choice(colors), initX2, 31, message2))
+        else:
+            try:
+                message2 = queue.get_nowait()
+            except asyncio.QueueEmpty:
+                message2 = None
+            else:
+                initX2 = -len(message2) * 10
+                line2 = iter(write_message(double_buffer, font, random.choice(colors), initX2, 31, message2))
+
         matrix.SwapOnVSync(double_buffer)
         await asyncio.sleep(0.02)
+        
 
 
 if __name__ == "__main__":
