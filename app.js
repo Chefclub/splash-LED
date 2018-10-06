@@ -5816,6 +5816,7 @@ var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
 var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5935,6 +5936,7 @@ var author$project$Main$view = function (model) {
 						elm$html$Html$button,
 						_List_fromArray(
 							[
+								elm$html$Html$Attributes$type_('button'),
 								elm$html$Html$Events$onClick(author$project$Main$SendMessage)
 							]),
 						_List_fromArray(
