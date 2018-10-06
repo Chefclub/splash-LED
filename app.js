@@ -5817,6 +5817,7 @@ var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProper
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5928,7 +5929,8 @@ var author$project$Main$view = function (model) {
 								elm$html$Html$Attributes$autofocus(true),
 								A2(elm$html$Html$Attributes$style, 'width', '100%'),
 								A2(elm$html$Html$Attributes$style, 'padding', '5px'),
-								elm$html$Html$Events$onInput(author$project$Main$NewMessage)
+								elm$html$Html$Events$onInput(author$project$Main$NewMessage),
+								elm$html$Html$Attributes$value(model.message)
 							]),
 						_List_Nil),
 						A2(elm$html$Html$br, _List_Nil, _List_Nil),
