@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ChefClub Splash LED</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
+</head>
+	<body class="is-preload">
+
+		<!-- Wrapper-->
+			<div id="wrapper">
+
+				<!-- Nav -->
+					<nav id="nav">
+						<a href="#" class="icon fa-home"><span>Home</span></a>
+						<a href="#splash" class="icon fa-envelope"><span>Send</span></a>
+						<a href="https://github.com/Chefclub/splash-LED" class="icon fa-github"><span>Github</span></a>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Me -->
+							<article id="home" class="panel intro">
+								<header>
+									<h1>Splash LED</h1>
+									<p>Use the envelope to send me a message</p>
+								</header>
+								<a href="#splash" class="jumplink pic">
+									<video src="rain.mp4" autoplay="true" muted="true" loop="true"></video>
+								</a>
+							</article>
+
+						<!-- Work -->
+						<article id="splash" class="panel">
+                            <div id="app"></div>
+						</article>
+
+					</div>
+
+				<!-- Footer -->
+					<div id="footer">
+						<ul class="copyright">
+							<li>&copy; Untitled.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+
+			</div>
+
+  		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+            <script src="app.js"></script>
+            <script>
+                const element = document.getElementById("app");
+                const app = Elm.Main.init({node: element});
+            </script>
+    </body>
+</html>
