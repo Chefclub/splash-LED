@@ -1,0 +1,32 @@
+{
+  "name": "chefclub-url-campaign-shortener",
+  "version": "1.0.0",
+  "description": "ChefClub URL Campaign Shortener",
+  "scripts": {
+    "build": "npm run cleanup && npm run copy-assets && elm make src/Main.elm --output=build/app.js",
+    "copy-assets": "rimraf build && mkdir build && cp -r public/* build",
+    "cleanup": "rimraf elm-stuff/",
+    "debug": "elm-live src/Main.elm --port=3000 --dir=public/ -- --output=public/app.js --debug",
+    "deploy": "npm run build && gh-pages --dist build/",
+    "live": "elm-live src/Main.elm --port=3000 --dir=public/ -- --output=public/app.js",
+    "test": "elm-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChefClub/url_campaign_shortener.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ChefClub/url_campaign_shortener/issues"
+  },
+  "homepage": "https://github.com/ChefClub/url_campaign_shortener#readme",
+  "author": "ChefClub",
+  "license": "ISC",
+  "devDependencies": {
+    "elm": "^0.19.0",
+    "elm-format": "^0.8.1",
+    "elm-live": "^3.0.6",
+    "elm-test": "^0.18.13-beta",
+    "gh-pages": "^2.0.0",
+    "rimraf": "^2.6.2"
+  }
+}
