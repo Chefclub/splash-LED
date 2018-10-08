@@ -77,6 +77,7 @@ view model =
                 , style "width" "100%"
                 , style "padding" "5px"
                 , onInput NewMessage
+                , value model.message
                 ]
                 []
             , br [] []
