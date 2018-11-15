@@ -45,7 +45,7 @@ update msg model =
 
         SendMessage ->
             ( model
-            , Http.send LoadMessageStatus <| sendMessage model.message
+            , sendMessage model.message
             )
 
         LoadMessageStatus (Ok response) ->
@@ -107,14 +107,14 @@ buildMultipartBody message =
         ]
 
 
-sendMessage : String -> Http.Request MessageStatus
+sendMessage : String -> Cmd Msg
 sendMessage message =
     Http.request
         { method = "POST"
         , headers = []
         , url = botUrl
         , body = buildMultipartBody message
-        , expect = Http.expectString
+        , expect = Http.expectString LoadMessageStatus
         , timeout = Nothing
-        , withCredentials = False
+        , tracker = Nothing
         }
